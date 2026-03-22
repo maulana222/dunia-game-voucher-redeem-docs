@@ -28,8 +28,7 @@ theme:
         icon: material/brightness-4
         name: Mode gelap
   features:
-    - navigation.tabs
-    - navigation.tabs.sticky
+    # Tanpa navigation.tabs → menu utama di sidebar kiri, bukan tab horizontal di header
     - navigation.sections
     - navigation.expand
     - navigation.top

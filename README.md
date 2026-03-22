@@ -1,87 +1,46 @@
-# Folder `docs/`
+# Dunia Game — dokumentasi
 
-| Isi | Keterangan |
-|-----|------------|
-| **`pages/`** | Sumber Markdown untuk MkDocs. |
-| **`site/`** | Hasil build — **jangan** diedit manual; diabaikan Git. |
-| **`mkdocs.yml`** | Konfigurasi jika Anda menjalankan MkDocs **dari folder `docs/`**. |
-
-## Opsi A — dari folder `docs/` (seperti di terminal Anda)
-
-```bash
-cd docs
-pip install -r requirements-docs.txt
-mkdocs serve
-# atau
-mkdocs build
-```
-
-Output: **`docs/site/`** (folder `site` di samping `pages`).
-
-## Opsi B — dari akar repo `dunia-game/`
-
-Di root ada **`mkdocs.yml`** lain dengan `docs_dir: docs/pages` dan `site_dir: docs/site`:
-
-```bash
-cd /path/to/dunia-game
-pip install -r requirements-docs.txt
-mkdocs serve
-```
-
-Jangan mencampur: kalau `cd docs`, pakai `docs/mkdocs.yml` (otomatis). Kalau di root, pakai `mkdocs.yml` di root.
+**Dokumentasi lengkap (browsing, pencarian, semua bab):**  
+**[https://maulana222.github.io/dunia-game-voucher-redeem-docs/](https://maulana222.github.io/dunia-game-voucher-redeem-docs/)**
 
 ---
 
-## Deploy ke GitHub Pages (tanpa `gh` CLI)
+## Tentang proyek
 
-Repo dokumentasi terpisah memakai workflow **`.github/workflows/deploy-pages.yml`**: setiap push ke **`main`** (jika berubah `pages/`, `mkdocs.yml`, dll.) akan menjalankan `mkdocs build` lalu mendorong isi folder **`site/`** ke branch **`gh-pages`**.
+**Dunia Game** adalah sistem untuk **redeem voucher** dan **transaksi prepaid game** (misalnya Mobile Legends, Free Fire, PUBG, Valorant, dan produk lain yang Anda daftarkan). Sistem menghubungkan **mitra atau reseller** yang mengirim order lewat API, **penyedia layanan game** yang memproses redeem di sisi infrastruktur resmi, dan **operator** yang mengelola produk, stok voucher, akun bisnis, serta pemantauan transaksi dari antarmuka web.
 
-### 1. Push workflow ke GitHub
+Tujuan utamanya adalah memberi jalur yang **terstruktur dan dapat diaudit**: setiap permintaan punya referensi unik, hasil akhir diberitahukan ke mitra lewat **callback**, dan status transaksi tersimpan untuk laporan serta troubleshooting.
 
-```bash
-cd docs
-git add .github/workflows/deploy-pages.yml README.md
-git commit -m "Add GitHub Pages deploy workflow"
-git push origin main
-```
+## Siapa yang memakainya?
 
-### 2. Izinkan Actions menulis ke repo
+| Peran | Peran dalam sistem |
+|--------|---------------------|
+| **Mitra / integrator** | Mengirim order programmatically, memvalidasi signature, menerima notifikasi hasil ke URL callback mereka |
+| **Operator / admin** | Mengatur member, produk, SKU, paket voucher, melihat dan mengekspor transaksi, mengelola pengaturan operasional |
+| **Member (bisnis)** | Entitas yang memiliki kredensial API terpisah; dapat dibatasi berdasarkan IP sumber request |
 
-Di GitHub: **Settings** → **Actions** → **General** → bagian **Workflow permissions** → pilih **Read and write permissions** → Save.
+## Fitur utama
 
-### 3. Aktifkan GitHub Pages
+- **API order** — endpoint untuk membuat permintaan redeem dengan ID referensi unik (`ref_id`), SKU produk, data pemain (`customer_no`), dan URL **callback** untuk hasil akhir.
+- **Signature & koneksi API** — setiap order memakai **MD5(username + api_key + ref_id)** agar hanya pemegang kunci yang sah yang bisa mengirim untuk username tersebut; koneksi API dapat dikaitkan dengan **whitelist IP**.
+- **Alur redeem ke penyedia** — backend menjalankan rangkaian langkah teknis ke API penyedia (ambil voucher, inquiry, transaksi, cek status), dengan **antrian**, **timeout**, dan **throttling** agar stabil di beban tinggi.
+- **Callback ke mitra** — setelah sukses, gagal, atau skenario khusus (misalnya hasil parsial pada order multi-unit), sistem mengirim **HTTP POST** ke `cb_url` dengan payload yang konsisten (kode hasil, pesan, detail transaksi).
+- **Panel administrasi** — antarmuka web untuk mengelola data master dan operasional: autentikasi dengan JWT, opsi **2FA**, manajemen voucher (termasuk operasi massal), produk, member, dan laporan transaksi.
+- **Pembaruan realtime** — untuk monitoring di browser, tersedia saluran **Socket.IO** (misalnya pembaruan transaksi, antrean, voucher, status sistem) ke ruang admin atau per pengguna.
+- **Kesehatan layanan** — endpoint ringan untuk cek apakah proses hidup dan apakah basis data serta konfigurasi kritis siap melayani.
 
-**Settings** → **Pages** → **Build and deployment**:
+## Integrasi untuk mitra
 
-- **Source:** *Deploy from a branch*
-- **Branch:** **`gh-pages`** — folder **`/ (root)`**
+Mitra mengarahkan sistem mereka ke **POST /api/orders** pada URL publik instalasi Anda, mengirim body JSON sesuai kontrak (termasuk `max_price` dan `allow_dot` sesuai validasi server), lalu menangani **callback** di sisi mereka dengan idempotensi yang wajar. Detail field, alur pending, dan pemetaan kode hasil dijelaskan di dokumentasi online di tautan di atas (bab **Integrasi API** dan **Fitur**).
 
-Simpan. Setelah workflow pertama selesai (tab **Actions**), URL biasanya:
+## Keamanan (ringkas)
 
-`https://maulana222.github.io/dunia-game-voucher-redeem-docs/`
+Autentikasi panel memakai **JWT** (cookie httpOnly diutamakan); order publik memakai **signature** dan opsi **pembatasan IP**. Gunakan **HTTPS** di produksi untuk API dan callback. Rahasia seperti `JWT_SECRET` dan kunci API hanya di lingkungan server, tidak di repositori publik.
 
-(ganti user/repo jika berbeda.)
+## Repositori ini
 
-### 4. Jika branch `gh-pages` belum muncul
+Repositori **dunia-game-voucher-redeem-docs** berisi **sumber dokumentasi** (Markdown di folder `pages/`, konfigurasi MkDocs). **Versi yang sudah di-build dan di-host** untuk dibaca publik ada di situs dokumentasi:
 
-Jalankan workflow sekali: tab **Actions** → workflow **Deploy dokumentasi ke GitHub Pages** → **Run workflow**, atau push commit ke `main`. Branch `gh-pages` dibuat otomatis oleh action **peaceiris/actions-gh-pages**.
+**[https://maulana222.github.io/dunia-game-voucher-redeem-docs/](https://maulana222.github.io/dunia-game-voucher-redeem-docs/)**
 
-### Catatan
-
-- Tidak perlu menginstal **`gh`** (GitHub CLI).
-- Isi **`site/`** tidak wajib di-commit ke `main` jika pakai Actions; cukup sumber di **`pages/`**.
-
----
-
-## Kenapa situs tampak seperti README (polos, bukan tema Material)?
-
-GitHub Pages memublikasikan **satu folder** yang Anda pilih. Yang benar untuk MkDocs adalah folder yang berisi **`index.html`** hasil `mkdocs build` (biasanya isi **`site/`**), **bukan** akar repo yang hanya punya `README.md` + `pages/*.md`.
-
-| Salah (tampilan seperti screenshot) | Benar |
-|--------------------------------------|--------|
-| Source: **main** + folder **/ (root)** atau **/docs** → tidak ada `index.html` di root publikasi → GitHub menampilkan **README.md** polos | Source: branch **`gh-pages`** + **/ (root)** → isinya hasil deploy MkDocs (ada **`index.html`**) |
-| Atau Anda buka URL ke path yang bukan `site/` | Atau Source: **main** + folder **`/site`** *hanya jika* Anda commit folder **`site/`** ke `main` |
-
-**Perbaikan:** **Settings → Pages → Build and deployment → Branch: `gh-pages`, folder `/ (root)`**. Tunggu workflow **Actions** selesai membuat branch `gh-pages` dulu.
-
-Pastikan juga **`site_url`** di `mkdocs.yml` sudah mengarah ke `https://USERNAME.github.io/REPO/` (sudah diset untuk repo ini) supaya aset tema tidak putus.
+Untuk kode aplikasi utama (backend, frontend admin, alat uji integrasi), lihat repositori atau monorepo proyek Dunia Game tempat layanan tersebut dikembangkan.
