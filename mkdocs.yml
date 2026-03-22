@@ -1,31 +1,41 @@
 # Jalankan dari folder ini: cd docs && mkdocs build
-# Path relatif terhadap lokasi file ini (bukan ke folder docs/ lagi).
 site_name: Dunia Game — Dokumentasi
 site_description: Sistem redeem voucher dan transaksi prepaid game.
-# Wajib untuk GitHub Pages (project site /nama-repo/) agar CSS, JS, dan link benar
+# Wajib untuk GitHub Pages (/nama-repo/) agar CSS, JS, dan navigasi tidak putus
 site_url: https://maulana222.github.io/dunia-game-voucher-redeem-docs/
+
+# Ikon GitHub + tautan di header (seperti dokumentasi Material pada umumnya)
+repo_url: https://github.com/maulana222/dunia-game-voucher-redeem-docs
+repo_name: maulana222/dunia-game-voucher-redeem-docs
+edit_uri: edit/main/pages/
 
 theme:
   name: material
   language: id
+  icon:
+    repo: fontawesome/brands/github
   palette:
     - scheme: default
-      primary: indigo
-      accent: indigo
+      primary: blue
+      accent: blue
       toggle:
         icon: material/brightness-7
         name: Mode terang
     - scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: blue
+      accent: blue
       toggle:
         icon: material/brightness-4
         name: Mode gelap
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.path
+    - navigation.indexes
+    - toc.follow
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -61,3 +71,6 @@ plugins:
 
 extra:
   generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/maulana222/dunia-game-voucher-redeem-docs
