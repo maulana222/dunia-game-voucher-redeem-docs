@@ -1,0 +1,62 @@
+# Jalankan dari folder ini: cd docs && mkdocs build
+# Path relatif terhadap lokasi file ini (bukan ke folder docs/ lagi).
+site_name: Dunia Game — Dokumentasi
+site_description: Sistem redeem voucher dan transaksi prepaid game.
+site_url: ""
+
+theme:
+  name: material
+  language: id
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Mode terang
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Mode gelap
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+docs_dir: pages
+site_dir: site
+
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Beranda: index.md
+  - Tentang aplikasi: tentang.md
+  - Fitur:
+      - fitur/redeem-transaksi.md
+      - fitur/panel-admin.md
+      - fitur/member-koneksi.md
+      - fitur/produk-voucher.md
+      - fitur/notifikasi-realtime.md
+      - fitur/antrian-pemrosesan.md
+  - Memulai: memulai.md
+  - Integrasi API (partner): integrasi-api.md
+  - Keamanan: keamanan.md
+
+plugins:
+  - search
+
+extra:
+  generator: false
