@@ -2,7 +2,8 @@
 # Path relatif terhadap lokasi file ini (bukan ke folder docs/ lagi).
 site_name: Dunia Game — Dokumentasi
 site_description: Sistem redeem voucher dan transaksi prepaid game.
-site_url: ""
+# Wajib untuk GitHub Pages (project site /nama-repo/) agar CSS, JS, dan link benar
+site_url: https://maulana222.github.io/dunia-game-voucher-redeem-docs/
 
 theme:
   name: material

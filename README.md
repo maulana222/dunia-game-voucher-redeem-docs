@@ -70,3 +70,18 @@ Jalankan workflow sekali: tab **Actions** → workflow **Deploy dokumentasi ke G
 
 - Tidak perlu menginstal **`gh`** (GitHub CLI).
 - Isi **`site/`** tidak wajib di-commit ke `main` jika pakai Actions; cukup sumber di **`pages/`**.
+
+---
+
+## Kenapa situs tampak seperti README (polos, bukan tema Material)?
+
+GitHub Pages memublikasikan **satu folder** yang Anda pilih. Yang benar untuk MkDocs adalah folder yang berisi **`index.html`** hasil `mkdocs build` (biasanya isi **`site/`**), **bukan** akar repo yang hanya punya `README.md` + `pages/*.md`.
+
+| Salah (tampilan seperti screenshot) | Benar |
+|--------------------------------------|--------|
+| Source: **main** + folder **/ (root)** atau **/docs** → tidak ada `index.html` di root publikasi → GitHub menampilkan **README.md** polos | Source: branch **`gh-pages`** + **/ (root)** → isinya hasil deploy MkDocs (ada **`index.html`**) |
+| Atau Anda buka URL ke path yang bukan `site/` | Atau Source: **main** + folder **`/site`** *hanya jika* Anda commit folder **`site/`** ke `main` |
+
+**Perbaikan:** **Settings → Pages → Build and deployment → Branch: `gh-pages`, folder `/ (root)`**. Tunggu workflow **Actions** selesai membuat branch `gh-pages` dulu.
+
+Pastikan juga **`site_url`** di `mkdocs.yml` sudah mengarah ke `https://USERNAME.github.io/REPO/` (sudah diset untuk repo ini) supaya aset tema tidak putus.
